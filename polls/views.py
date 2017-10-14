@@ -6,3 +6,6 @@ def index(request):
 
 def search(request):
     return render(request, 'polls/search.html')
+
+def voting(request):
+    return render(request, 'polls/voting.html')

@@ -6,7 +6,7 @@ class Vote(models.Model):
     voted_time = models.CharField(max_length=200)
 
 class Song(models.Model):
-    sID = models.CharField(max_length=200)
+    sID = models.CharField(max_length=200) # spotify ID
     name = models.CharField(max_length=200)
     artists = models.CharField(max_length=200)
     album = models.CharField(max_length=200)

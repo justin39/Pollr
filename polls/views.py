@@ -23,7 +23,7 @@ def nameGen(userName):
     return playlistName
 
 def create_playlist(request):
-    u = requests.session[user_id] # user id string
+    u = requests.session['user_id'] # user id string
     r = requests.post('https://api.spotify.com/v1/users/' + u + '/playlists/',
         data = {
             'description': 'Playlist created automatically by Pollr!',

@@ -39,7 +39,7 @@ def auth(request):
                           data = {
                               'grant_type': 'authorization_code',
                               'code': code,
-                              'redirect_uri': 'http://localhost:8080/auth',
+                              'redirect_uri': 'https://afternoon-plains-93869.herokuapp.com/auth',
                               'client_id': SPOTIFY_ID,
                               'client_secret': SPOTIFY_SECRET
                           },

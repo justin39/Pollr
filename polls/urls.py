@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^auth/$',views.auth, name='auth'),
     url(r'^search$', views.search, name='search'),
     url(r'^voting$', views.voting, name='voting'),
-    url(r'^search-results$', views.searchSong, name='searchSong')
+    url(r'^search-results$', views.song_search_form, name='search-results')
 ]

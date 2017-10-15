@@ -17,7 +17,7 @@ def vote_status(request, user_id):
     return render(request, 'polls/status.html', {'songs': songs, 'user_id': user_id})
 
 def login(request):
-    if request.session.get('access_token', '') != '':
+    if 'user_id' in request.session:
         return redirect('/polls/')
     else:
         return render(request, 'polls/login.html', {'SPOTIFY_ID': SPOTIFY_ID})
@@ -130,7 +130,7 @@ def call_vote(request, user_id):
 
 # Context Processors
 def spotify_session(request):
-    if request.session.get('access_token', '') != '':
+    if 'user_id' in request.session:
         context = {
             'logged_in': True,
             'user': request.session['user_id']

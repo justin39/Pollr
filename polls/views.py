@@ -17,7 +17,7 @@ def vote_status(request, user_id):
     return render(request, 'polls/status.html', {'songs': songs, 'user_id': user_id})
 
 def login(request):
-    if 'user_id' in request.session:
+    if request.session.get('access_token', '') != '':
         return redirect('/polls/')
     else:
         return render(request, 'polls/login.html', {'SPOTIFY_ID': SPOTIFY_ID})
@@ -108,7 +108,7 @@ def submit_vote(request, user_id):
             s = Song.objects.create(sID=song_id, name=rj['name'], album=rj['album']['name'], artists=art_list, votes = 1, uid=user_id)
         v = Vote.objects.create(email=voter_email, uid=user_id)
         messages.add_message(request, messages.SUCCESS, "Submitted your vote - come back for the next voting cycle later!")
-        return redirect('/polls/' + user_id)
+        return redirect('/polls/' + user_id + '/status')
 
 def call_vote(request, user_id):
     results = Song.objects.filter(uid=user_id).order_by('-votes')[:1].values_list('sID', flat=True)
@@ -126,7 +126,7 @@ def call_vote(request, user_id):
         messages.add_message(request, messages.SUCCESS, "Added songs to playlist!")
     else:
         messages.add_message(request, messages.ERROR, "Error adding songs to playlist, please try again")
-    return redirect('/polls/' + user_id)
+    return redirect('/polls/' + user_id + '/status')
 
 # Context Processors
 def spotify_session(request):

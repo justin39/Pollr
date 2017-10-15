@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'^(\w+)/vote$', views.vote, name='vote'),
     url(r'^(\w+)/submit-vote$', views.submit_vote, name='submit_vote'),
     url(r'^(\w+)/call-vote$', views.call_vote, name='call_vote'),
-    url(r'^(\w+)$', views.vote_status, name='vote_status'),
+    url(r'^(\w+)/status$', views.vote_status, name='vote_status'),
 ]

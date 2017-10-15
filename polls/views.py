@@ -1,5 +1,6 @@
 import os
 import requests
+import random # I'm sorry
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -9,6 +10,27 @@ from .forms import SongSearchForm
 
 SPOTIFY_ID = os.environ['SPOTIFY_ID']
 SPOTIFY_SECRET = os.environ['SPOTIFY_SECRET']
+
+def caesarCipher(userName,randomInteger):
+    for i in range(0:len(userName)-1):
+        userName[i] = ord(userName[i]) + randomInteger
+    return userName
+
+def nameGen(userName):
+    playlistName = 'Pollr Auto:'
+    randNameExt = caesarCipher(userName,random.randint(1,13))
+    playlistName = playlistName + randNameExt
+    return playlistName
+
+def create_playlist(request):
+    u = requests.session['user_id'] # user id string
+    r = requests.post('https://api.spotify.com/v1/users/' + u + '/playlists/',
+        data = {
+            'description': 'Playlist created automatically by Pollr!',
+            'public': True,
+            'name': nameGen(u)
+        }
+    )
 
 def song_search_form(request):
     # If this is a POST request we process the form data

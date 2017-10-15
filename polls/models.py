@@ -1,11 +1,13 @@
 from django.db import models
 
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+class Vote(models.Model):
+    userSelection = False #user's default choice for a song is unselected
+    email = models.CharField(max_length=200)
+    voted_time = models.CharField(max_length=200)
 
-
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+class Song(models.Model):
+    sID = models.CharField(max_length=200) # spotify ID
+    name = models.CharField(max_length=200)
+    artists = models.CharField(max_length=200)
+    album = models.CharField(max_length=200)
+    votes = models.PositiveIntegerField(default=0)

@@ -46,3 +46,9 @@ def auth(request):
         else:
             messages.add_message(request, messages.ERROR, "Could not log in to Spotify: Got " + str(r.status_code))
             return redirect('/polls/login', {'SPOTIFY_ID': SPOTIFY_ID})
+
+def search(request):
+    return render(request, 'polls/search.html')
+
+def voting(request):
+    return render(request, 'polls/voting.html')

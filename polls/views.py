@@ -88,6 +88,16 @@ def auth(request):
                 return render(request, 'polls/login.html', {'SPOTIFY_ID': SPOTIFY_ID})
             request.session['access_token'] = response['access_token']
             request.session['refresh_token'] = response['refresh_token']
+            profile = requests.get('https://api.spotify.com/v1/me',
+                                   headers = {
+                                       'Authorization': "Bearer {}".format(request.session['access_token'])
+                                   })
+            try:
+                user = profile.json()
+            except ValueError:
+                messages.add_message(request, messages.ERROR, "Error getting user id, please try again")
+                return render(request, 'polls/login.html', {'SPOTIFY_ID': SPOTIFY_ID})
+            request.session['user_id'] = user['id']
             messages.add_message(request, messages.SUCCESS, "Successfully authenticated with Spotify")
             return redirect('/polls/')
         else:
@@ -97,13 +107,16 @@ def auth(request):
 def search(request):
     return render(request, 'polls/search.html')
 
-def voting(request):
-    return render(request, 'polls/voting.html')
+def vote(request, user_id):
+    return render(request, 'polls/vote.html', {'user_id': user_id})
 
 # Context Processors
 def spotify_session(request):
     if request.session['access_token'] is not None:
-        context = {'logged_in': True}
+        context = {
+            'logged_in': True,
+            'user': request.session['user_id']
+        }
     else:
         context = {'logged_in': False}
     return context

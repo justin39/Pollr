@@ -1,0 +1,25 @@
+.spotify-green {
+    background-color: 1ED760;
+}
+
+.pt-50 {
+    padding-top: 50px;
+}
+
+.pr-15 {
+    padding-right: 15;
+}
+
+.auth-btn {
+    border-radius: 0;
+    -moz-border-radius: 0;
+    height: 100%;
+}
+
+.nav-item {
+    list-style: none;
+}
+
+.navbar {
+    background-color: lightgray;
+}

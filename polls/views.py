@@ -87,7 +87,22 @@ def search(request):
     return render(request, 'polls/search.html')
 
 def vote(request, user_id):
-    return render(request, 'polls/vote.html', {'user_id': user_id})
+    r = requests.post('https://accounts.spotify.com/api/token',
+                      data = {
+                          'grant_type': 'client_credentials',
+                          'client_id': SPOTIFY_ID,
+                          'client_secret': SPOTIFY_SECRET
+                      },
+    )
+    token = ''
+    if r.status_code == requests.codes.ok:
+        try:
+            response = r.json()
+            token = response['access_token']
+        except ValueError:
+            messages.add_message(request, messages.ERROR, "Error getting token from Spotify, please try again later")
+            return render(request, '/')
+    return render(request, 'polls/vote.html', {'user_id': user_id, 'token': token})
 
 # Context Processors
 def spotify_session(request):

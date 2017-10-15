@@ -1,0 +1,77 @@
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery=1%}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% include "polls/navbar.html" %}
+
+<div class="container pt-50">
+
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Vote on playlist {{user_id}}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <form action="/submit-vote" method="post">
+                    <input id="user-id" name="user-id" type="hidden" value="{{user_id}}">
+                    <label for="voter-email">Email address</label>
+                    <input type="email" id="voter-email" class="form-control" placeholder="Enter an email">
+                    <label for="song">Song ID</label>
+                    <input type="text" id="song-id" class="form-control" disabled="true">
+                    <input type="submit" class="btn btn-primary mt-10">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row pt-50">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="song">Search for a song</label>
+                <input type="text" id="song-name" class="form-control">
+                <btn class="btn btn-primary mt-10" onclick="search()">Search</btn>
+            </div>
+            <div id="search-results">
+                <div id="search-anchor"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+ var token = '{{token}}';
+
+ function search() {
+     $('#search-results').empty();
+     $('#search-results').wrapInner("<div id=\"search-anchor\"></div>");
+     var title = $('#song-name')[0].value;
+
+     $.ajax({
+         url: 'https://api.spotify.com/v1/search?q=' + title + '&type=track',
+         headers: {
+             Authorization: 'Bearer ' + token
+         },
+         success: function(result) {
+             for (var i = 0; i < result['tracks']['items'].length; i++) {
+                 var track = result['tracks']['items'][i];
+                 var artists = track['artists'].map(artist => artist.name);
+    $('#search-anchor').append("<div class=\"well\">" + track.name + "<br>" + track['album'].name + "<br>" + artists + "<br><btn class=\"btn btn-success mt-10\" onclick=\"addSong('" + track.id + "')\">Pick Song</btn></div>");
+             }
+         }
+     });
+ }
+
+ function addSong(id) {
+     $('#song-id').val(id);
+ }
+</script>

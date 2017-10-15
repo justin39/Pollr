@@ -11,10 +11,10 @@ SPOTIFY_SECRET = os.environ['SPOTIFY_SECRET']
 
 def index(request):
     return render(request, 'polls/index.html')
-    if request.session['access_token'] is not None:
-        return render(request, 'polls/index.html', {'LOGGED_IN': True})
-    else:
-        return render(request, 'polls/index.html', {'LOGGED_IN': False})
+
+def vote_status(request, user_id):
+    songs = list(Song.objects.filter(uid=user_id))
+    return render(request, 'polls/status.html', {'songs': songs, 'user_id': user_id})
 
 def login(request):
     if request.session['access_token'] is not None:
@@ -39,7 +39,7 @@ def auth(request):
                           data = {
                               'grant_type': 'authorization_code',
                               'code': code,
-                              'redirect_uri': 'http://localhost:8080/polls/auth',
+                              'redirect_uri': 'http://localhost:8080/auth',
                               'client_id': SPOTIFY_ID,
                               'client_secret': SPOTIFY_SECRET
                           },
@@ -50,7 +50,7 @@ def auth(request):
                 response = r.json()
             except ValueError:
                 messages.add_message(request, messages.ERROR, "Error getting token from Spotify, please try again")
-                return render(request, 'polls/login.html', {'SPOTIFY_ID': SPOTIFY_ID})
+                return redirect('/login', {'SPOTIFY_ID': SPOTIFY_ID})
             request.session['access_token'] = response['access_token']
             request.session['refresh_token'] = response['refresh_token']
             profile = requests.get('https://api.spotify.com/v1/me',
@@ -61,14 +61,14 @@ def auth(request):
                 user = profile.json()
             except ValueError:
                 messages.add_message(request, messages.ERROR, "Error getting user id, please try again")
-                return render(request, 'polls/login.html', {'SPOTIFY_ID': SPOTIFY_ID})
+                return redirect('/login', {'SPOTIFY_ID': SPOTIFY_ID})
             request.session['user_id'] = user['id']
             playlist = create_playlist(request)
             if create_playlist(request):
                 messages.add_message(request, messages.SUCCESS, "Successfully authenticated with Spotify")
             else:
                 messages.add_message(request, messages.ERROR, "Failed to create playlist - please log out and try again")
-            return redirect('/polls/')
+            return redirect('/')
         else:
             messages.add_message(request, messages.ERROR, "Could not log in to Spotify: Got " + str(r.status_code))
             return redirect('/polls/login', {'SPOTIFY_ID': SPOTIFY_ID})
@@ -85,7 +85,7 @@ def submit_vote(request, user_id):
     song_id = request.POST.get('song-id')
     if Vote.objects.filter(email=voter_email, uid=user_id).exists():
         messages.add_message(request, messages.ERROR, "You cannot vote again until the next cycle!")
-        return redirect('polls')
+        return redirect('/polls')
     else:
         song_query = Song.objects.filter(sID=song_id, uid=user_id)
         if song_query.exists():
@@ -108,14 +108,13 @@ def submit_vote(request, user_id):
             s = Song.objects.create(sID=song_id, name=rj['name'], album=rj['album']['name'], artists=art_list, votes = 1, uid=user_id)
         v = Vote.objects.create(email=voter_email, uid=user_id)
         messages.add_message(request, messages.SUCCESS, "Submitted your vote - come back for the next voting cycle later!")
-        return redirect('/polls/')
+        return redirect('/polls/' + user_id)
 
 def call_vote(request, user_id):
-    num = int(request.GET.get('n', '1'))
-    results = Song.objects.filter(uid=user_id).order_by('votes')[:n].values_list('sID', flat=True)
+    results = Song.objects.filter(uid=user_id).order_by('-votes')[:1].values_list('sID', flat=True)
     r = requests.post('https://api.spotify.com/v1/users/' + user_id + '/playlists/' + request.session['playlist_id'] + '/tracks',
                       json = {
-                          'uris': list(map(lambda x: 'spotify:track:' + x))
+                          'uris': list(map(lambda x: 'spotify:track:' + x, results))
                       },
                       headers = {
                           'Authorization': 'Bearer ' + request.session['access_token']
@@ -127,7 +126,7 @@ def call_vote(request, user_id):
         messages.add_message(request, messages.SUCCESS, "Added songs to playlist!")
     else:
         messages.add_message(request, messages.ERROR, "Error adding songs to playlist, please try again")
-    return redirect('/polls/')
+    return redirect('/polls/' + user_id)
 
 # Context Processors
 def spotify_session(request):

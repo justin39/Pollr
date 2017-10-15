@@ -8,12 +8,16 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
-<div class="container">
+<body>
 
-    <div class="row">
-        <div class="col-md-2">
-            <h1>This is where the search page is.</h1>
-        </div>
-    </div>
+<form action="/poll/search-results" method="post">
+    Song name:<br>
+    <input type="text" name="songName" value="Fuckboi">
+    <br>
+    Artist name:<br>
+    <input type="text" name="artistName" value="AJJ">
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
 
-</div>
+</body>

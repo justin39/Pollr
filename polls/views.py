@@ -9,12 +9,22 @@ SPOTIFY_SECRET = os.environ['SPOTIFY_SECRET']
 
 def index(request):
     return render(request, 'polls/index.html')
+    if request.session['access_token'] is not None:
+        return render(request, 'polls/index.html', {'LOGGED_IN': True})
+    else:
+        return render(request, 'polls/index.html', {'LOGGED_IN': False})
 
 def login(request):
     if request.session['access_token'] is not None:
         return redirect('/polls/')
     else:
         return render(request, 'polls/login.html', {'SPOTIFY_ID': SPOTIFY_ID})
+
+def logout(request):
+    request.session['access_token'] = None
+    request.session['refresh_token'] = None
+    messages.add_message(request, messages.SUCCESS, "Successfully logged out")
+    return redirect('/polls/')
 
 def auth(request):
     code = request.GET.get('code')
@@ -42,7 +52,7 @@ def auth(request):
             request.session['access_token'] = response['access_token']
             request.session['refresh_token'] = response['refresh_token']
             messages.add_message(request, messages.SUCCESS, "Successfully authenticated with Spotify")
-            return redirect('/polls/index')
+            return redirect('/polls/')
         else:
             messages.add_message(request, messages.ERROR, "Could not log in to Spotify: Got " + str(r.status_code))
             return redirect('/polls/login', {'SPOTIFY_ID': SPOTIFY_ID})
@@ -52,3 +62,11 @@ def search(request):
 
 def voting(request):
     return render(request, 'polls/voting.html')
+
+# Context Processors
+def spotify_session(request):
+    if request.session['access_token'] is not None:
+        context = {'logged_in': True}
+    else:
+        context = {'logged_in': False}
+    return context

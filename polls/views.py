@@ -130,7 +130,7 @@ def call_vote(request, user_id):
 
 # Context Processors
 def spotify_session(request):
-    if request.session['access_token'] is not None:
+    if request.session.get('access_token') is not None:
         context = {
             'logged_in': True,
             'user': request.session['user_id']

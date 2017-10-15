@@ -12,21 +12,17 @@
 
 <nav class="navbar navbar-fixed-top">
     <a class="navbar-brand" href="/">Pollr</a>
-    <ul class="navbar-nav">
-        {% if logged_in %}
-        <li class="nav-item">
-            <span class="navbar-text">Your ID: {{user}}</span>
-        </li>
-        {% endif %}
-    </ul>
     <ul class="navbar-nav navbar-right pr-15">
         {% if logged_in %}
         <li class="nav-item">
-            <a class="btn btn-danger auth-btn" href="/polls/logout">Logout</a>
+            <div><span class="navbar-text">Your ID: {{user}}</span></div>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-danger auth-btn" href="/logout">Logout</a>
         </li>
         {% else %}
         <li class="nav-item">
-            <a class="btn btn-success auth-btn" href="/polls/login">Login</a>
+            <a class="btn btn-success auth-btn" href="/login">Login</a>
         </li>
         {% endif %}
     </ul>
